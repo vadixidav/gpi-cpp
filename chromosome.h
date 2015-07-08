@@ -1,0 +1,40 @@
+#ifndef CHROMOSOME_H
+#define CHROMOSOME_H
+
+#include <cstdint>
+#include <vector>
+#include <random>
+
+#define TOTAL_OPERATIONS 4
+
+#define CHROMOSOME_BIT 0x8000
+
+namespace gpi {
+    struct Instruction {
+        uint8_t opcode;
+        uint16_t params[2];
+        double solve(double a, double b) const;
+    };
+    
+    struct MUXInstruction {
+        uint16_t params[2];
+        Instruction choices[2];
+        
+        int_fast8_t choose(double a, double b) const;
+        void randomize(unsigned position, unsigned chromosomePosition, std::mt19937 &rand);
+        void mutate(unsigned position, unsigned chromosomePosition, std::mt19937 &rand);
+    };
+
+    struct Chromosome {
+        std::vector<MUXInstruction> instructions;
+        
+        Chromosome(unsigned length);
+        ~Chromosome();
+        
+        void randomize(unsigned position, std::mt19937 &rand);
+        void mutate(unsigned position, std::mt19937 &rand);
+    };
+}
+
+#endif // CHROMOSOME_H
+
