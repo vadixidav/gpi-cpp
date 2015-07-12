@@ -14,7 +14,7 @@ int main() {
     
     std::mt19937 rand;
     rand.seed(time(0));
-    gpi::Population pop(100, 1.0, 1000, 5, 2, 10, 32, rand);
+    gpi::Population pop(100, 1.0, 500, 5, 2, 10, 32, rand);
     
     for (int i = 0; ; i++) {
         gpi::Program &prog = pop.next(rand);
