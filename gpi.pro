@@ -23,11 +23,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     chromeosome.cpp \
     meprogram.cpp \
-    gpi.cpp
+    gpi.cpp \
+    fpspopulation.cpp
 
 HEADERS += \
     chromosome.h \
     gpi.h \
-    meprogram.h
+    meprogram.h \
+    fpspopulation.h \
+    individual.h
 
 CONFIG += c++11

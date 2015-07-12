@@ -15,26 +15,26 @@ int main() {
     
     std::mt19937 rand;
     rand.seed(time(0));
-    gpi::Program prog(7, 4, 10, 32, rand);
+    gpi::Population pop(100, 0.5, 100, 7, 4, 10, 32, rand);
     
     for (int i = 0; ; i++) {
-        prog.randomize(rand);
+        gpi::Program &prog = pop.next(rand);
         prog.startSolve();
         std::cout << "Trial " << i << std::endl;
         int j;
+        int sucess = 0;
         for (j = 0; j != 4; j++) {
             double res = prog.solveOutput(j, inputs);
             if (isClose(res, outputs[j])) {
-                std::cout << "Output match" << std::endl;
-            } else {
-                std::cout << "Output fail" << std::endl;
-                break;
+                sucess++;
             }
         }
-        if (j == 4) {
-            std::cout << "Success!" << std::endl;
+        std::cout << sucess << " successes" << std::endl;
+        if (sucess == 4) {
+            std::cout << "Program correct!" << std::endl;
             break;
         }
+        pop.rate(1024 * sucess / 4);
     }
     
     return 0;

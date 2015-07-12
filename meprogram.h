@@ -23,8 +23,8 @@ namespace gpi {
         std::vector<Scratchpad> scratchValues;
         
         //Construct a new program and randomize it
-        MEProgram(int totalInputs, int totalOutputs, int totalInternalChromosomes,
-                int totalChromosomeSize, std::mt19937 &rand);
+        MEProgram(unsigned totalInputs, unsigned totalOutputs, unsigned totalInternalChromosomes,
+                unsigned totalChromosomeSize, std::mt19937 &rand);
         
         //Construct a new program as a copy of another
         MEProgram(const MEProgram &parent);

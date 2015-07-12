@@ -10,8 +10,8 @@ namespace gpi {
         return !std::isnan(result);
     }
 
-    MEProgram::MEProgram(int totalInputs, int totalOutputs, int totalInternalChromosomes,
-                     int totalChromosomeSize, std::mt19937 &rand) : tInputs(totalInputs), tOutputs(totalOutputs),
+    MEProgram::MEProgram(unsigned totalInputs, unsigned totalOutputs, unsigned totalInternalChromosomes,
+                     unsigned totalChromosomeSize, std::mt19937 &rand) : tInputs(totalInputs), tOutputs(totalOutputs),
                      tInternalChromosomes(totalInternalChromosomes), tChromosomeSize(totalChromosomeSize) {
         //Inputs and chromosomes cannot total higher than 32768
         assert(totalInputs + totalInternalChromosomes <= 32768);
