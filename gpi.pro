@@ -20,10 +20,14 @@ CONFIG(debug, debug|release) {
     }
 }
 
-SOURCES += program.cpp \
-    chromeosome.cpp
+SOURCES += \
+    chromeosome.cpp \
+    meprogram.cpp \
+    gpi.cpp
 
-HEADERS += program.h \
-    chromosome.h
+HEADERS += \
+    chromosome.h \
+    gpi.h \
+    meprogram.h
 
 CONFIG += c++11

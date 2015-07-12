@@ -21,6 +21,16 @@ namespace gpi {
         unsigned selection = rand() % instructions.size();
         instructions[selection].mutate(selection, position, rand);
     }
+    
+    void Chromosome::crossover(const Chromosome &other, unsigned point, bool direction) {
+        if (direction) {
+            for (unsigned i = point; i != instructions.size(); i++)
+                instructions[i] = other.instructions[i];
+        } else {
+            for (unsigned i = 0; i != point; i++)
+                instructions[i] = other.instructions[i];
+        }
+    }
 
     double Instruction::solve(double a, double b) const {
         switch (opcode) {

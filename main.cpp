@@ -1,4 +1,4 @@
-#include "program.h"
+#include "gpi.h"
 
 #include <iostream>
 #include <cmath>

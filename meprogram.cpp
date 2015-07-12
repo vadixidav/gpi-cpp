@@ -1,4 +1,4 @@
-#include "program.h"
+#include "meprogram.h"
 #include <cassert>
 
 namespace gpi {
@@ -10,13 +10,9 @@ namespace gpi {
         return !std::isnan(result);
     }
 
-    Program::Program(int totalInputs, int totalOutputs, int totalInternalChromosomes,
-                     int totalChromosomeSize, std::mt19937 &rand) {
-        tInputs = totalInputs;
-        tOutputs = totalOutputs;
-        tInternalChromosomes = totalInternalChromosomes;
-        tChromosomeSize = totalChromosomeSize;
-        
+    MEProgram::MEProgram(int totalInputs, int totalOutputs, int totalInternalChromosomes,
+                     int totalChromosomeSize, std::mt19937 &rand) : tInputs(totalInputs), tOutputs(totalOutputs),
+                     tInternalChromosomes(totalInternalChromosomes), tChromosomeSize(totalChromosomeSize) {
         //Inputs and chromosomes cannot total higher than 32768
         assert(totalInputs + totalInternalChromosomes <= 32768);
         assert(totalChromosomeSize <= 32768);
@@ -29,11 +25,27 @@ namespace gpi {
         randomize(rand);
     }
     
-    Program::Program(const Program &parent) {
+    MEProgram::MEProgram(const MEProgram &parent) {
         *this = parent;
     }
     
-    void Program::randomize(std::mt19937 &rand) {
+    void MEProgram::crossover(const MEProgram &parent, std::mt19937 &rand) {
+        assert(tInputs == parent.tInputs);
+        assert(tOutputs == parent.tOutputs);
+        assert(tInternalChromosomes == parent.tInternalChromosomes);
+        assert(tChromosomeSize == parent.tChromosomeSize);
+        
+        for (unsigned i = 0; i != tInternalChromosomes; i++) {
+            unsigned crossoverPoint = rand() % tChromosomeSize;
+            internalChromosomes[i].crossover(parent.internalChromosomes[i], crossoverPoint, (rand() % 2));
+        }
+        for (unsigned i = 0; i != tOutputs; i++) {
+            unsigned crossoverPoint = rand() % tChromosomeSize;
+            outputChromosomes[i].crossover(parent.outputChromosomes[i], crossoverPoint, (rand() % 2));
+        }
+    }
+    
+    void MEProgram::randomize(std::mt19937 &rand) {
         //Emplace all chromosomes (there is no empty constructor)
         for (unsigned i = 0; i != tInternalChromosomes; i++)
             internalChromosomes.emplace_back(tChromosomeSize);
@@ -52,7 +64,7 @@ namespace gpi {
         }
     }
     
-    void Program::mutate(std::mt19937 &rand) {
+    void MEProgram::mutate(std::mt19937 &rand) {
         auto selection = rand() % (tInternalChromosomes + tOutputs);
         if (selection < tInternalChromosomes) {
             internalChromosomes[selection].mutate(selection + tInputs, rand);
@@ -61,46 +73,46 @@ namespace gpi {
         }
     }
     
-    double solveProgramChromosome(Program &program, const Chromosome &chromosome, double *inputs);
-    double solveProgramChromosomeInstruction(Program &program, const Chromosome &chromosome, double *inputs,
+    double solveChromosome(MEProgram &MEProgram, const Chromosome &chromosome, double *inputs);
+    double solveChromosomeInstruction(MEProgram &MEProgram, const Chromosome &chromosome, double *inputs,
                                              std::vector<Scratchpad> &intermediates, uint16_t sel);
     
-    double solveProgramSelection(Program &program, const Chromosome &chromosome, double *inputs,
+    double solveSelection(MEProgram &MEProgram, const Chromosome &chromosome, double *inputs,
                                  std::vector<Scratchpad> &intermediates, uint16_t sel) {
         if (sel & CHROMOSOME_BIT) {
             uint16_t index = sel & ~CHROMOSOME_BIT;
-            if (index < program.tInputs)
+            if (index < MEProgram.tInputs)
                 return inputs[index];
             
-            index -= program.tInputs;
+            index -= MEProgram.tInputs;
             
-            if (program.scratchValues[index].isSolved())
-                return program.scratchValues[index].result;
+            if (MEProgram.scratchValues[index].isSolved())
+                return MEProgram.scratchValues[index].result;
             
-            program.scratchValues[index].result = solveProgramChromosome(program, program.internalChromosomes[index],
+            MEProgram.scratchValues[index].result = solveChromosome(MEProgram, MEProgram.internalChromosomes[index],
                                                                          inputs);
-            assert(std::isnormal(program.scratchValues[index].result));
+            assert(std::isnormal(MEProgram.scratchValues[index].result));
             
-            return program.scratchValues[index].result;
+            return MEProgram.scratchValues[index].result;
         }
         
         if (intermediates[sel].isSolved())
             return intermediates[sel].result;
         
-        return solveProgramChromosomeInstruction(program, chromosome, inputs, intermediates, sel);
+        return solveChromosomeInstruction(MEProgram, chromosome, inputs, intermediates, sel);
     }
     
-    double solveProgramChromosomeInstruction(Program &program, const Chromosome &chromosome, double *inputs,
+    double solveChromosomeInstruction(MEProgram &MEProgram, const Chromosome &chromosome, double *inputs,
                                              std::vector<Scratchpad> &intermediates, uint16_t sel) {
         const MUXInstruction &mins = chromosome.instructions[sel];
-        auto choice = mins.choose(solveProgramSelection(program, chromosome, inputs, intermediates,
+        auto choice = mins.choose(solveSelection(MEProgram, chromosome, inputs, intermediates,
                                                         mins.params[0]),
-                                  solveProgramSelection(program, chromosome, inputs, intermediates,
+                                  solveSelection(MEProgram, chromosome, inputs, intermediates,
                                                         mins.params[1]));
         const Instruction &ins = mins.choices[choice];
-        intermediates[sel].result = ins.solve(solveProgramSelection(program, chromosome, inputs, intermediates,
+        intermediates[sel].result = ins.solve(solveSelection(MEProgram, chromosome, inputs, intermediates,
                                                            ins.params[0]),
-                                     solveProgramSelection(program, chromosome, inputs, intermediates,
+                                     solveSelection(MEProgram, chromosome, inputs, intermediates,
                                                            ins.params[1]));
         
         if (!std::isnormal(intermediates[sel].result))
@@ -109,17 +121,17 @@ namespace gpi {
         return intermediates[sel].result;
     }
     
-    double solveProgramChromosome(Program &program, const Chromosome &chromosome, double *inputs) {
+    double solveChromosome(MEProgram &MEProgram, const Chromosome &chromosome, double *inputs) {
         std::vector<Scratchpad> intermediates(chromosome.instructions.size());
-        return solveProgramChromosomeInstruction(program, chromosome, inputs, intermediates,
+        return solveChromosomeInstruction(MEProgram, chromosome, inputs, intermediates,
                                                  chromosome.instructions.size() - 1);
     }
     
-    double Program::solveOutput(unsigned output, double *inputs) {
-        return solveProgramChromosome(*this, outputChromosomes[output], inputs);
+    double MEProgram::solveOutput(unsigned output, double *inputs) {
+        return solveChromosome(*this, outputChromosomes[output], inputs);
     }
     
-    void Program::startSolve() {
+    void MEProgram::startSolve() {
         scratchValues.resize(0);
         scratchValues.resize(tInternalChromosomes);
     }

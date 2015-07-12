@@ -33,6 +33,7 @@ namespace gpi {
         
         void randomize(unsigned position, std::mt19937 &rand);
         void mutate(unsigned position, std::mt19937 &rand);
+        void crossover(const Chromosome &other, unsigned point, bool direction);
     };
 }
 
