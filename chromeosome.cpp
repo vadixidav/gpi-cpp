@@ -34,17 +34,18 @@ namespace gpi {
 
     double Instruction::solve(double a, double b) const {
         switch (opcode) {
-        case 0:
+        case Opcode::ADD:
             return a + b;
-        case 1:
+        case Opcode::SUB:
             return a - b;
-        case 2:
+        case Opcode::MUL:
             return a * b;
-        case 3:
+        case Opcode::DIV:
             if (std::isnormal(b))
                 return a / b;
-            else
-                return 1; //Return 1 in case division would make no sense
+            return 1; //Return 1 in case division would make no sense
+        case Opcode::MAX:
+            break;
         }
         //Execution should not reach this point
         return NAN;
@@ -63,10 +64,10 @@ namespace gpi {
         //TODO: Make it so the choice is not 50% for both but adapts instead
         params[0] = produceParam(position, chromosomePosition, rand);
         params[1] = produceParam(position, chromosomePosition, rand);
-        choices[0].opcode = rand() % TOTAL_OPERATIONS;
+        choices[0].opcode = Opcode(rand() % unsigned(Opcode::MAX));
         choices[0].params[0] = produceParam(position, chromosomePosition, rand);
         choices[0].params[1] = produceParam(position, chromosomePosition, rand);
-        choices[1].opcode = rand() % TOTAL_OPERATIONS;
+        choices[1].opcode = Opcode(rand() % unsigned(Opcode::MAX));
         choices[1].params[0] = produceParam(position, chromosomePosition, rand);
         choices[1].params[1] = produceParam(position, chromosomePosition, rand);
     }
@@ -76,7 +77,7 @@ namespace gpi {
         if (choice < 2) {
             params[choice] = produceParam(position, chromosomePosition, rand);
         } else if (choice < 4) {
-            choices[choice-2].opcode = rand() % TOTAL_OPERATIONS;
+            choices[choice-2].opcode = Opcode(rand() % unsigned(Opcode::MAX));
         } else if (choice < 6) {
             choices[choice-4].params[0] = produceParam(position, chromosomePosition, rand);
         } else {

@@ -5,13 +5,19 @@
 #include <vector>
 #include <random>
 
-#define TOTAL_OPERATIONS 4
-
 #define CHROMOSOME_BIT 0x8000
 
 namespace gpi {
+    enum class Opcode {
+        ADD,
+        SUB,
+        MUL,
+        DIV,
+        MAX
+    };
+
     struct Instruction {
-        uint8_t opcode;
+        Opcode opcode;
         uint16_t params[2];
         double solve(double a, double b) const;
     };

@@ -23,6 +23,7 @@ namespace gpi {
         void *d;
         
     public:
+        //Every member of the population will have these constraints after the population is created
         Population(unsigned maxPrograms, double mutationRate, unsigned mutationTries, unsigned totalInputs,
                       unsigned totalOutputs, unsigned totalInternalChromosomes,
                       unsigned totalChromosomeSize, std::mt19937 &rand);
