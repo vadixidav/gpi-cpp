@@ -11,6 +11,8 @@ TARGET = gpi
 TEMPLATE = lib
 DEFINES += GPI_LIBRARY
 
+CONFIG += c++11
+
 unix {
     target.path = /usr/lib
     INSTALLS += target
@@ -28,5 +30,3 @@ HEADERS += \
     meprogram.h \
     fpspopulation.h \
     individual.h
-
-CONFIG += c++11

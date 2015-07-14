@@ -19,7 +19,7 @@ int main() {
     //Play around with the parameters based on your needs; higher mutation rates will not mutate the fittest individual.
     //If using 0 chromosomes, the output layer has one chromosome per output, but there are no internal chromosomes.
     /*                  populationSize, mutationRate,   mutationTries,  inputs, outputs,    chromosomes,    chromSize*/
-    gpi::Population pop(100,            0.5,            20,            6,      2,          0,              32, rand);
+    gpi::Population pop(100,            0.5,            20,            6,      2,          8,              32, rand);
     
     //A single program can be initialized similarly and manual mutation and crossover is available (see header)
     
