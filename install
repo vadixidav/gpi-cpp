@@ -1,0 +1,6 @@
+#!/bin/bash
+
+make
+sudo make install
+sudo mkdir -p /usr/include/gpi/
+sudo cp *.h /usr/include/gpi/

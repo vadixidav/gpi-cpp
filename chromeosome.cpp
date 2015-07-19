@@ -43,7 +43,11 @@ namespace gpi {
         case Opcode::DIV:
             if (std::isnormal(b))
                 return a / b;
-            return 1; //Return 1 in case division would make no sense
+            return 1;
+        case Opcode::ABS:
+            return std::abs(a);
+        case Opcode::SEL:
+            return a;
         case Opcode::MAX:
             break;
         }

@@ -13,6 +13,8 @@ namespace gpi {
         SUB,
         MUL,
         DIV,
+        ABS,
+        SEL,
         MAX
     };
 
